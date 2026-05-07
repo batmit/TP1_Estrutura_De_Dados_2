@@ -5,8 +5,9 @@ bool buscaBin(Registro* registros, int chave, int l, int r, Registro* resultado,
 bool BuscaBinaria(Registro* registros, int quantidade, char* situacao, Registro* resultado, Dados* dados);
 bool BuscaSequencial(Registro* registros, int quantidade, Registro* resultado, Dados* dados);
 
-void CalculaMedia(FILE* arquivo, int quantidade, char* situacao, 
-                  Registro* resultado, Dados* dados){
+//OBS: a calcula media deve valer para todas as formas de busca, não apenas a indexada
+//Apenas a que a pessoa escolher
+void CalculaMedia(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados){
     int totalComparacoesIndexacao = 0;
     int totalComparacoesPesquisa = 0;
     int totalTransferenciasIndexacao = 0;
@@ -40,8 +41,7 @@ void CalculaMedia(FILE* arquivo, int quantidade, char* situacao,
     printf("Media de Tempo: %lf s\n", totalTempo / 10);
 }
 
-bool BuscaSequencialIndexada(FILE* arquivo, int quantidade, char* situacao,
-                             Registro* resultado, Dados* dados){
+bool BuscaSequencialIndexada(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados){
 
     if(strcmp(situacao, "aleatoria") == 0){
         printf("Busca sequencial indexada nao eh adequada para registros em ordem aleatoria...\n");
@@ -56,7 +56,8 @@ bool BuscaSequencialIndexada(FILE* arquivo, int quantidade, char* situacao,
     //Cria o índice
     int *chaves = (int*) malloc(sizeof(int) * (quantidade / TAM_PAGINA + 1));//+1 caso quantidade % TAM_PAGINA != 0
     //Guarda uma pagina de registros
-    Registro reg[TAM_PAGINA];
+    // Trocar o nome de reg para pagina
+    Registro reg[TAM_PAGINA]; 
     int pos = 0;
 
     if((arquivo = fopen("registros.bin", "rb")) == NULL){
@@ -263,6 +264,8 @@ void criaAleatorio(int quantidade){
     }
 
     Registro reg;
+    
+    // Alterar forma que chave eh escolhida para evitar numeros repetidos
 
     for(int i = 0; i < quantidade; i++){
         reg.chave = rand() % quantidade; // Gera uma chave aleatória

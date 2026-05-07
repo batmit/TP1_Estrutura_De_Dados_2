@@ -11,6 +11,8 @@ void ArvoreBinariaDePesquisa(FILE* arquivo, int quantidade, char* situacao, Regi
     //Guarda as chaves do índice
     printf("Criando indice...\n");
     int *paginas = (int*) malloc(sizeof(int) * (quantidade / TAM_PAGINA + 1));//+1 caso quantidade % TAM_PAGINA != 0
+
+    //
     for(int i = 0; i < quantidade / TAM_PAGINA + 1; i++){
         paginas[i] = i * TAM_PAGINA;//paginas[i] guarda o indice do primeiro item da página i no arquivo. ex: paginas[0] = 0, paginas[1] = 30, paginas[2] = 60, e assim por diante.
     }
