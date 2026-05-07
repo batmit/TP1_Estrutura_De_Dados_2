@@ -230,8 +230,8 @@ void criaCrescente(int quantidade){
     for(int i = 0; i < quantidade; i++){
         reg.chave = i;
         reg.dado1 = i * 10;
-        itoa(i, reg.dado2, 10); 
-        itoa(i * 10, reg.dado3, 10); 
+        sprintf(reg.dado2, "%d", reg.chave);
+        sprintf(reg.dado3, "%d", reg.chave * 10); 
         fwrite(&reg, sizeof(Registro), 1, arquivo);
     }
     fclose(arquivo);
@@ -249,8 +249,8 @@ void criaDecrescente(int quantidade){
     for(int i = quantidade - 1; i >= 0; i--){
         reg.chave = i;
         reg.dado1 = i * 10;
-        itoa(i, reg.dado2, 10);
-        itoa(i * 10, reg.dado3, 10);
+        sprintf(reg.dado2, "%d", reg.chave);
+        sprintf(reg.dado3, "%d", reg.chave * 10);
         fwrite(&reg, sizeof(Registro), 1, arquivo);
     }
     fclose(arquivo);
@@ -270,8 +270,8 @@ void criaAleatorio(int quantidade){
     for(int i = 0; i < quantidade; i++){
         reg.chave = rand() % quantidade; // Gera uma chave aleatória
         reg.dado1 = reg.chave * 10;
-        itoa(i, reg.dado2, 10); // Converte o valor para string
-        itoa(i * 10, reg.dado3, 10); // Converte o valor para string
+        sprintf(reg.dado2, "%d", reg.chave); // Converte o valor para string
+        sprintf(reg.dado3, "%d", reg.chave); // Converte o valor para string
         fwrite(&reg, sizeof(Registro), 1, arquivo);
     }
     fclose(arquivo);

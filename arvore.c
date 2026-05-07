@@ -3,11 +3,13 @@
 void ArvoreBinariaDePesquisa(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados){
     //Realiza a transcrição do arquivo original para um outro arquivo, onde os registros são organizados em uma árvore binária de pesquisa
 
-    if(fopen("registros.bin", "rb") == NULL){
+    
+
+    criarArvore(situacao, quantidade);
+    if((arquivo = fopen("arvore.bin", "rb")) == NULL){
         printf("Erro ao abrir o arquivo\n");
         return;
     }
-
     //Guarda as chaves do índice
     printf("Criando indice...\n");
     int *paginas = (int*) malloc(sizeof(int) * (quantidade / TAM_PAGINA + 1));//+1 caso quantidade % TAM_PAGINA != 0
@@ -33,13 +35,15 @@ bool ArvoreBuscaBinaria(FILE* arquivo, char* situacao, int* paginas, Registro* r
     //e decidindo se deve ir para o filho esquerdo ou direito, até encontrar a chave ou chegar em um nó folha.
     
     No pagina[TAM_PAGINA];
-    No* raiz = NULL;
+    No raiz;
 
     printf("Lendo a raiz da arvore...\n");
     fread(pagina, sizeof(No), TAM_PAGINA, arquivo);//lê a primeira página do arquivo para o vetor, onde pagina[0] é o primeiro item do arquivo, pagina[1] é o segundo, e assim por diante. 
+    raiz = pagina[0];
     dados->transferencias.indexacao++;//contabiliza a
+    
 
-    return Busca(arquivo, raiz, 0, paginas, pagina, resultado, dados);//começa a busca na raiz da árvore, que é o primeiro item do arquivo, ou seja, o item 0
+    return Busca(arquivo, &raiz, 0, paginas, pagina, resultado, dados);//começa a busca na raiz da árvore, que é o primeiro item do arquivo, ou seja, o item 0
 
     //
 }
@@ -51,6 +55,7 @@ bool Busca(FILE* arquivo, No* no, int indice, int* paginas, No* pagina, Registro
 
     if(indice == -1)//alcançou um nó folha, ou seja, a chave não foi encontrada
         return false;
+
 
     if(indice < paginas[indice] || indice >= paginas[indice + 1]){//Se o indice do nó atual nao estiver na pagina atual, realiza a leitura da nova pagina
         int paginaAtual = indice / TAM_PAGINA;//paginaAtual é o indice da página onde esta o nó indicado pelo indice
@@ -72,3 +77,131 @@ bool Busca(FILE* arquivo, No* no, int indice, int* paginas, No* pagina, Registro
     else
         return Busca(arquivo, no, no->indiceDir, paginas, pagina, resultado, dados);
 }
+
+void criarArvore(char *situacao, int quantidade){
+
+
+    FILE *arquivoArvore = fopen("arvore.bin", "wb+");
+    FILE *registro = fopen("registros.bin", "rb");
+
+    Registro pagina[TAM_PAGINA];
+    No noCopia;
+    int lidos;
+
+    while((lidos = fread(pagina, sizeof(Registro), TAM_PAGINA, registro)) > 0){
+
+        
+
+        for(int i = 0; i < lidos; i++){
+
+            noCopia.reg = pagina[i];
+            noCopia.indiceDir = -1;
+            noCopia.indiceEsq = -1;
+            inserirArvore(arquivoArvore,&noCopia);
+            
+            
+
+        }
+
+
+
+    }
+
+    
+
+
+
+    fclose(arquivoArvore);
+    fclose(registro);
+
+}
+
+
+void inserirArvore(FILE *arquivoArvore, No *noCopia){
+
+    No noRegistro;
+
+
+    
+    fseek(arquivoArvore, 0, SEEK_END);
+
+    if(ftell(arquivoArvore) == 0){
+        fwrite(noCopia, sizeof(No), 1, arquivoArvore);
+        return;
+    }
+
+    fseek(arquivoArvore, 0, SEEK_SET);
+
+
+    while(fread(&noRegistro, sizeof(No), 1, arquivoArvore) > 0){
+
+        if(noRegistro.reg.chave < noCopia->reg.chave){
+
+            if(noRegistro.indiceDir == -1){
+
+                fseek(arquivoArvore, -(long)sizeof(No), SEEK_CUR);
+
+                long posAnterior = ftell(arquivoArvore);
+
+                fseek(arquivoArvore, 0, SEEK_END);
+                long arquivoFinal = ftell(arquivoArvore);
+                int indice = arquivoFinal/(sizeof(No));
+                fwrite(noCopia, sizeof(No), 1, arquivoArvore);
+
+                fseek(arquivoArvore, posAnterior, SEEK_SET);
+                noRegistro.indiceDir = indice;
+
+                fwrite(&noRegistro, sizeof(No), 1, arquivoArvore);
+
+                return;
+
+
+            }else{
+                
+                fseek(arquivoArvore, sizeof(No)*noRegistro.indiceDir, SEEK_SET);
+
+
+            }
+
+
+        }else if(noRegistro.reg.chave > noCopia->reg.chave){
+
+            if(noRegistro.indiceEsq == -1){
+                fseek(arquivoArvore, -(long)sizeof(No), SEEK_CUR);
+
+                long posAnterior = ftell(arquivoArvore);
+
+                fseek(arquivoArvore, 0, SEEK_END);
+                long arquivoFinal = ftell(arquivoArvore);
+                long indice = arquivoFinal/(sizeof(No));
+                fwrite(noCopia, sizeof(No), 1, arquivoArvore);
+
+                fseek(arquivoArvore, posAnterior, SEEK_SET);
+                noRegistro.indiceEsq = indice;
+
+                fwrite(&noRegistro, sizeof(No), 1, arquivoArvore);
+                
+
+                return;
+                
+            }else{
+
+                fseek(arquivoArvore, sizeof(No)*noRegistro.indiceEsq, SEEK_SET);
+
+            }
+
+
+        }else{
+
+            printf("Valor duplicado na árvore!\n");
+            return;
+
+
+        }
+
+
+    }
+
+
+}
+

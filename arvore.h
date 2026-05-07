@@ -14,5 +14,11 @@ void ArvoreBinariaDePesquisa(FILE* arquivo, int quantidade, char* situacao, Regi
 bool ArvoreBuscaBinaria(FILE* arquivo, char* situacao, int* paginas, Registro* resultado, Dados* dados);
 
 bool Busca(FILE* arquivo, No* no, int indice, int* paginas, No* pagina, Registro* resultado, Dados* dados);
+void criarArvore(char *situacao, int quantidade);
+
+void inserirArvore(FILE *arquivoArvore, No *noCopia);
+
+
+
 
 #endif

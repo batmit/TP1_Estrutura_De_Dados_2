@@ -102,7 +102,7 @@ void Ins(Registro reg, TipoPagina* Ap, bool *cresceu, Registro* resultado, TipoP
 void Insere(Registro reg, TipoPagina** Ap, char* situacao, Dados* dados){
     bool cresceu;
     Registro resultado;
-    TipoPagina* ApRetorno, *ApTemp;
+    TipoPagina* ApRetorno;
 
     Ins(reg, *Ap, &cresceu, &resultado, &ApRetorno, dados);
     if(cresceu){
