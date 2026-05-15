@@ -4,10 +4,10 @@
 bool buscaBin(Registro* registros, int chave, int l, int r, Registro* resultado, Comparacao* comparacoes);
 bool BuscaBinaria(Registro* registros, int quantidade, char* situacao, Registro* resultado, Dados* dados);
 bool BuscaSequencial(Registro* registros, int quantidade, Registro* resultado, Dados* dados);
-//void embaralhar(Registro* v, int tamanho);
+
 void trocarNoArquivo(FILE* arquivo, long i, long j);
 
-bool BuscaSequencialIndexada(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados){
+bool BuscaSequencialIndexada(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados, int TAM_PAGINA){
 
     if(strcmp(situacao, "aleatoria") == 0){
         printf("Busca sequencial indexada nao eh adequada para registros em ordem aleatoria...\n");
@@ -44,7 +44,7 @@ bool BuscaSequencialIndexada(FILE* arquivo, int quantidade, char* situacao, Regi
     printf("Realizando a busca pela chave %d...\n", resultado->chave);
 
     if(strcmp(situacao, "crescente") == 0 || strcmp(situacao, "decrescente") == 0){//busca apenas funciona para arquivos em ordem crescente ou decrescente
-        if(pesquisaSequencial(chaves, pos, situacao, arquivo, resultado, dados)){
+        if(pesquisaSequencial(chaves, pos, situacao, arquivo, resultado, dados, TAM_PAGINA)){
             printf("Chave encontrada: %d\n", resultado->chave);
             printf("Dado1: %ld\n", resultado->dado1);
             printf("Dado2: %s\n", resultado->dado2);
@@ -63,7 +63,7 @@ bool BuscaSequencialIndexada(FILE* arquivo, int quantidade, char* situacao, Regi
     return false;
 }
 
-bool pesquisaSequencial(int *chaves, int pos, char* situacao, FILE* arquivo, Registro* resultado, Dados* dados){
+bool pesquisaSequencial(int *chaves, int pos, char* situacao, FILE* arquivo, Registro* resultado, Dados* dados, int TAM_PAGINA){
     //recebe a situacao para saber se o arquivo está em ordem crescente ou decrescente
     printf("Realizando pesquisa sequencial no indice...\n");
     Registro pagina[TAM_PAGINA];

@@ -1,21 +1,21 @@
 #include "arvore.h"
 
-void ArvoreBinariaDePesquisa(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados){
+void ArvoreBinariaDePesquisa(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados, int TAM_PAGINA){
     //Realiza a transcrição do arquivo original para um outro arquivo, onde os registros são organizados em uma árvore binária de pesquisa
 
     
 
-    criarArvore(situacao, quantidade);
+    criarArvore(situacao, quantidade, TAM_PAGINA);
     if((arquivo = fopen("arvore.bin", "rb")) == NULL){
         printf("Erro ao abrir o arquivo\n");
         return;
     }
     
-    ArvoreBuscaBinaria(arquivo, situacao, resultado, dados);
+    ArvoreBuscaBinaria(arquivo, situacao, resultado, dados, TAM_PAGINA);
     fclose(arquivo);
 }
 
-bool ArvoreBuscaBinaria(FILE* arquivo, char* situacao, Registro* resultado, Dados* dados){
+bool ArvoreBuscaBinaria(FILE* arquivo, char* situacao, Registro* resultado, Dados* dados, int TAM_PAGINA){
     //O arquivo contem uma arvore, em que cada item do arquivo é um nó da árvore, 
     //e cada nó tem um registro e dois endereços, neste caso, indices, para os filhos esquerdo e direito, 
     //ex: o item 10 é o primeiro item do arquivo e possui dois filhos, os itens 5 e 15, filho esq e dir, respectivamente. 
@@ -34,12 +34,12 @@ bool ArvoreBuscaBinaria(FILE* arquivo, char* situacao, Registro* resultado, Dado
     raiz = pagina[0];
     
     int paginaCarregada = 0; // página 0 já foi lida no fread inicial
-    return Busca(arquivo, &raiz, 0, pagina, resultado, dados, &paginaCarregada);//começa a busca na raiz da árvore, que é o primeiro item do arquivo, ou seja, o item 0
+    return Busca(arquivo, &raiz, 0, pagina, resultado, dados, &paginaCarregada, TAM_PAGINA);//começa a busca na raiz da árvore, que é o primeiro item do arquivo, ou seja, o item 0
 
     //
 }
 
-bool Busca(FILE* arquivo, No* no, int indice, No* pagina, Registro* resultado, Dados* dados, int *paginaCarregada){
+bool Busca(FILE* arquivo, No* no, int indice, No* pagina, Registro* resultado, Dados* dados, int *paginaCarregada, int TAM_PAGINA){
     //Busca a chave do resultado no nó do arquivo indicado pelo indice, e retorna o registro encontrado ou NULL se não encontrar
     //A função é chamada recursivamente para percorrer a árvore, comparando a chave do resultado com a chave do nó atual, 
     //e decidindo se deve ir para o filho esquerdo ou direito, até encontrar a chave ou chegar em um nó folha.
@@ -72,12 +72,12 @@ bool Busca(FILE* arquivo, No* no, int indice, No* pagina, Registro* resultado, D
         return true;
     }
     else if(no->reg.chave > resultado->chave)
-        return Busca(arquivo, no, no->indiceEsq, pagina, resultado, dados, paginaCarregada);
+        return Busca(arquivo, no, no->indiceEsq, pagina, resultado, dados, paginaCarregada, TAM_PAGINA);
     else
-        return Busca(arquivo, no, no->indiceDir, pagina, resultado, dados, paginaCarregada);
+        return Busca(arquivo, no, no->indiceDir, pagina, resultado, dados, paginaCarregada, TAM_PAGINA);
 }
 
-void criarArvore(char *situacao, int quantidade){
+void criarArvore(char *situacao, int quantidade, int TAM_PAGINA){
 
 
     FILE *arquivoArvore = fopen("arvore.bin", "wb+");

@@ -4,16 +4,22 @@ void Inicializa(TipoPagina** raiz) {
     *raiz = NULL;
 }
 
-void ArvoreB(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados) {
+
+void ArvoreB(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados, int TAM_PAGINA) {
+    
+    FILE* registro = fopen("registros.bin", "rb");
     TipoPagina *arvoreB;
     Inicializa(&arvoreB);
 
     Registro reg;
     
     for(int i = 0; i < quantidade; i++){
-        fread(&reg, sizeof(Registro), 1, arquivo);
+        fread(&reg, sizeof(Registro), 1, registro);
         Insere(reg, &arvoreB, situacao, dados);
     }
+
+    Pesquisa(resultado, arvoreB, situacao, dados);
+    fclose(registro);
 }
 
 

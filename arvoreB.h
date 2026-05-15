@@ -12,6 +12,7 @@ typedef struct TipoPagina{
     struct TipoPagina* p[MM + 1];//ponteiros para as páginas filhas
 } TipoPagina;
 
+void ArvoreB(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados, int TAM_PAGINA);
 void Inicializa(TipoPagina** raiz);
 void Pesquisa(Registro* x, TipoPagina* Ap, char* situacao, Dados* dados);
 void InsereNaPagina(TipoPagina* Ap, Registro reg, TipoPagina* ApDir);

@@ -7,7 +7,7 @@
 #include <string.h>
 #include <time.h>  
 
-#define TAM_PAGINA 10
+#define TAM_PAGINA_MAX 1000
 
 typedef struct registro {
     int chave;
@@ -30,7 +30,5 @@ typedef struct dados{
     Transferencia transferencias;
     Comparacao comparacoes;
 } Dados;
-
-
 
 #endif

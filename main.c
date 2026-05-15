@@ -5,8 +5,9 @@
 
 #include "indexada.h"
 #include "arvore.h"
+#include "arvoreB.h"
 
-void CalculaMedia(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados, int metodo);
+void CalculaMedia(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados, int metodo, int TAM_PAG);
 void imprimirRegistros();
 //void imprimirNoArvore(FILE *arquivo, int indice);
 //void imprimirArvore(const char *nomeArquivo);
@@ -15,6 +16,8 @@ void imprimirRegistros();
 int main(int argc, char *argv[]){//pesquisa <método> <quantidade> <situação> <chave> [-P] 
 
     int tam_pagina = atoi(argv[2]) / 10;
+    if(tam_pagina > TAM_PAGINA_MAX)
+        tam_pagina = TAM_PAGINA_MAX;
 
     srand(time(NULL));
 
@@ -38,23 +41,23 @@ int main(int argc, char *argv[]){//pesquisa <método> <quantidade> <situação> 
 
     if(atoi(argv[1]) == 1){//Busca Sequencial Indexada
         inicio = clock();
-        BuscaSequencialIndexada(arquivo, atoi(argv[2]), argv[3], &resultado, &dados);
+        BuscaSequencialIndexada(arquivo, atoi(argv[2]), argv[3], &resultado, &dados, tam_pagina);
         fim = clock();
     }
     else if(atoi(argv[1]) == 2){//Arvore Binária de Pesquisa
         inicio = clock();
-        ArvoreBinariaDePesquisa(arquivo, atoi(argv[2]), argv[3], &resultado, &dados);
+        ArvoreBinariaDePesquisa(arquivo, atoi(argv[2]), argv[3], &resultado, &dados, tam_pagina);
         fim = clock();
         //imprimirArvore("arvore.bin");
     }
     else if(atoi(argv[1]) == 3){//Árvore B
         inicio = clock();
-        //ArvoreB(arquivo, atoi(argv[2]), &resultado, &dados);
+        ArvoreB(arquivo, atoi(argv[2]), argv[3], &resultado, &dados, tam_pagina);
         fim = clock();
     }
     else if(atoi(argv[1]) == 4){//Árvore B*
         inicio = clock();
-        //ArvoreBEstrela(arquivo, atoi(argv[2]), &resultado, &dados);
+        //ArvoreBEstrela(arquivo, atoi(argv[2]), &resultado, &dados, tam_pagina);
         fim = clock();
     }
     else{
@@ -76,13 +79,13 @@ int main(int argc, char *argv[]){//pesquisa <método> <quantidade> <situação> 
 
     printf("----------------------------\n");
 
-    CalculaMedia(arquivo, atoi(argv[2]), argv[3], &resultado, &dados, atoi(argv[1]));
+    //CalculaMedia(arquivo, atoi(argv[2]), argv[3], &resultado, &dados, atoi(argv[1]), tam_pagina);
     return 0;
 }
 
 //OBS: a calcula media deve valer para todas as formas de busca, não apenas a indexada
 //Apenas a que a pessoa escolher
-void CalculaMedia(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados, int metodo){
+void CalculaMedia(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados, int metodo, int TAM_PAG){
     int totalComparacoesIndexacao = 0;
     int totalComparacoesPesquisa = 0;
     int totalTransferenciasIndexacao = 0;
@@ -93,9 +96,9 @@ void CalculaMedia(FILE* arquivo, int quantidade, char* situacao, Registro* resul
         resultado->chave = rand() % quantidade; //gera uma chave aleatória para a busca
         clock_t inicio = clock();
         if(metodo == 1)
-            BuscaSequencialIndexada(arquivo, quantidade, situacao, resultado, dados);
+            BuscaSequencialIndexada(arquivo, quantidade, situacao, resultado, dados, TAM_PAG);
         else if(metodo == 2)
-            ArvoreBinariaDePesquisa(arquivo, quantidade, situacao, resultado, dados);
+            ArvoreBinariaDePesquisa(arquivo, quantidade, situacao, resultado, dados, TAM_PAG);
         else if (metodo == 3){
             //ArvoreB(arquivo, quantidade, resultado, dados);
             printf("Arvore b\n");
