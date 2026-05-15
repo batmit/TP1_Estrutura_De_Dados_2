@@ -53,10 +53,12 @@ bool Busca(FILE* arquivo, No* no, int indice, int* paginas, No* pagina, Registro
     //A função é chamada recursivamente para percorrer a árvore, comparando a chave do resultado com a chave do nó atual, 
     //e decidindo se deve ir para o filho esquerdo ou direito, até encontrar a chave ou chegar em um nó folha.
 
-    if(indice == -1)//alcançou um nó folha, ou seja, a chave não foi encontrada
+    if(indice == -1){//alcançou um nó folha, ou seja, a chave não foi encontrada
+        printf("Chave %d não encontrada na árvore!\n", resultado->chave);
         return false;
-
-
+    }
+    //int paginaAtual = indice / TAM_PAGINA;
+    //if(indice < paginas[paginaAtual] || indice >= paginas[paginaAtual + 1]){
     if(indice < paginas[indice] || indice >= paginas[indice + 1]){//Se o indice do nó atual nao estiver na pagina atual, realiza a leitura da nova pagina
         int paginaAtual = indice / TAM_PAGINA;//paginaAtual é o indice da página onde esta o nó indicado pelo indice
         fseek(arquivo, paginaAtual * TAM_PAGINA * sizeof(No), SEEK_SET);//posiciona o ponteiro do arquivo no início da página onde esta o nó indicado pelo indice
@@ -70,6 +72,7 @@ bool Busca(FILE* arquivo, No* no, int indice, int* paginas, No* pagina, Registro
     dados->comparacoes.pesquisa++;//contabiliza a comparação da chave do resultado com a chave do nó atual
     if(no->reg.chave == resultado->chave){
         *resultado = no->reg;
+        printf("Chave %d encontrada na árvore!\n", resultado->chave);
         return true;
     }
     else if(no->reg.chave > resultado->chave)
@@ -205,3 +208,67 @@ void inserirArvore(FILE *arquivoArvore, No *noCopia){
 
 }
 
+
+
+// arvore.h (campos relevantes inferidos do código)
+// typedef struct {
+//     int chave;
+//     // outros campos...
+// } Registro;
+//
+// typedef struct {
+//     Registro reg;
+//     int indiceEsq;
+//     int indiceDir;
+// } No;
+
+void imprimirNoArvore(FILE *arquivo, int indice, int nivel) {
+    if (indice == -1)
+        return;
+
+    No no;
+
+    if (fseek(arquivo, (long)indice * sizeof(No), SEEK_SET) != 0) {
+        fprintf(stderr, "Erro ao posicionar no índice %d\n", indice);
+        return;
+    }
+
+    if (fread(&no, sizeof(No), 1, arquivo) != 1) {
+        fprintf(stderr, "Erro ao ler o nó no índice %d\n", indice);
+        return;
+    }
+
+    // Imprime indentação de acordo com o nível
+    for (int i = 0; i < nivel; i++)
+        printf("    ");
+
+    printf("Índice: %d | Chave: %d | Esq: %d | Dir: %d\n",
+           indice, no.reg.chave, no.indiceEsq, no.indiceDir);
+
+    imprimirNoArvore(arquivo, no.indiceEsq, nivel + 1);
+    imprimirNoArvore(arquivo, no.indiceDir, nivel + 1);
+}
+
+void imprimirArvore(const char *nomeArquivo) {
+    FILE *arquivo = fopen(nomeArquivo, "rb");
+    if (arquivo == NULL) {
+        fprintf(stderr, "Erro ao abrir o arquivo '%s'\n", nomeArquivo);
+        return;
+    }
+
+    fseek(arquivo, 0, SEEK_END);
+    long long tamanho = ftell(arquivo);
+    if (tamanho == 0) {
+        printf("Árvore vazia.\n");
+        fclose(arquivo);
+        return;
+    }
+
+    int totalNos = (int)(tamanho / sizeof(No));
+    printf("=== Árvore Binária de Pesquisa (%d nós) ===\n\n", totalNos);
+
+    imprimirNoArvore(arquivo, 0, 0);
+
+    printf("\n==========================================\n");
+    fclose(arquivo);
+}

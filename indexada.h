@@ -9,7 +9,4 @@ bool pesquisaSequencial(int *chaves, int pos, char* situacao, FILE* arquivo, Reg
 
 void CriaArquivo(int quantidade, char* situacao);
 
-//função para calcular a média de comparações, transferências e tempo de 10 operações de busca com chaves aleatórias
-void CalculaMedia(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados);
-
 #endif

@@ -4,42 +4,8 @@
 bool buscaBin(Registro* registros, int chave, int l, int r, Registro* resultado, Comparacao* comparacoes);
 bool BuscaBinaria(Registro* registros, int quantidade, char* situacao, Registro* resultado, Dados* dados);
 bool BuscaSequencial(Registro* registros, int quantidade, Registro* resultado, Dados* dados);
+void embaralhar(Registro* v, int tamanho);
 
-//OBS: a calcula media deve valer para todas as formas de busca, não apenas a indexada
-//Apenas a que a pessoa escolher
-void CalculaMedia(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados){
-    int totalComparacoesIndexacao = 0;
-    int totalComparacoesPesquisa = 0;
-    int totalTransferenciasIndexacao = 0;
-    int totalTransferenciasPesquisa = 0;
-    double totalTempo = 0.0;
-
-    for(int i = 0; i < 10; i++){
-        resultado->chave = rand() % quantidade; //gera uma chave aleatória para a busca
-        clock_t inicio = clock();
-        BuscaSequencialIndexada(arquivo, quantidade, situacao, resultado, dados);
-        clock_t fim = clock();
-        double tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
-
-        totalComparacoesIndexacao += dados->comparacoes.indexacao;
-        totalComparacoesPesquisa += dados->comparacoes.pesquisa;
-        totalTransferenciasIndexacao += dados->transferencias.indexacao;
-        totalTransferenciasPesquisa += dados->transferencias.pesquisa;
-        totalTempo += tempo;
-
-        //Reseta as contagens para a próxima iteração
-        dados->comparacoes.indexacao = 0;
-        dados->comparacoes.pesquisa = 0;
-        dados->transferencias.indexacao = 0;
-        dados->transferencias.pesquisa = 0;
-    }
-
-    printf("Media de Comparacoes na Indexacao: %d\n", totalComparacoesIndexacao / 10);
-    printf("Media de Comparacoes na Pesquisa: %d\n", totalComparacoesPesquisa / 10);
-    printf("Media de Transferencias na Indexacao: %d\n", totalTransferenciasIndexacao / 10);
-    printf("Media de Transferencias na Pesquisa: %d\n", totalTransferenciasPesquisa / 10);
-    printf("Media de Tempo: %lf s\n", totalTempo / 10);
-}
 
 bool BuscaSequencialIndexada(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados){
 
@@ -263,16 +229,28 @@ void criaAleatorio(int quantidade){
         return;
     }
 
-    Registro reg;
-    
+    Registro pag[TAM_PAGINA];
+    int tam = TAM_PAGINA;
     // Alterar forma que chave eh escolhida para evitar numeros repetidos
+    int cont = 0;
+    for(int i = 0; i < quantidade / TAM_PAGINA + 1; i++){
 
-    for(int i = 0; i < quantidade; i++){
-        reg.chave = rand() % quantidade; // Gera uma chave aleatória
-        reg.dado1 = reg.chave * 10;
-        sprintf(reg.dado2, "%d", reg.chave); // Converte o valor para string
-        sprintf(reg.dado3, "%d", reg.chave); // Converte o valor para string
-        fwrite(&reg, sizeof(Registro), 1, arquivo);
+        if(i == quantidade / TAM_PAGINA)
+            tam = quantidade % TAM_PAGINA;
+    
+        for(int j = 0; j < tam; j++){
+
+            pag[j].chave = cont; // Gera uma chave aleatória
+            pag[j].dado1 = pag[j].chave * 10;
+            sprintf(pag[j].dado2, "%d", pag[j].chave); // Converte o valor para string
+            sprintf(pag[j].dado3, "%d", pag[j].chave); // Converte o valor para string
+            
+            cont++;
+        }
+
+        embaralhar(pag, tam);
+
+        fwrite(&pag, sizeof(Registro), 1, arquivo);
     }
     fclose(arquivo);
 }   
@@ -295,3 +273,13 @@ void CriaArquivo(int quantidade, char* situacao){
         return;
     }
 }
+
+void embaralhar(Registro* v, int tamanho) {
+    for(int i = tamanho - 1; i > 0; i--){
+        int j = rand() % (i + 1);
+        Registro tmp = v[i];
+        v[i] = v[j];
+        v[j] = tmp;
+    }
+}
+
