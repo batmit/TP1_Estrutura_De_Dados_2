@@ -14,6 +14,8 @@ void imprimirRegistros();
 
 int main(int argc, char *argv[]){//pesquisa <método> <quantidade> <situação> <chave> [-P] 
 
+    int tam_pagina = atoi(argv[2]) / 10;
+
     srand(time(NULL));
 
     if(argc != 5 && argc != 6){

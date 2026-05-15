@@ -4,8 +4,8 @@
 bool buscaBin(Registro* registros, int chave, int l, int r, Registro* resultado, Comparacao* comparacoes);
 bool BuscaBinaria(Registro* registros, int quantidade, char* situacao, Registro* resultado, Dados* dados);
 bool BuscaSequencial(Registro* registros, int quantidade, Registro* resultado, Dados* dados);
-void embaralhar(Registro* v, int tamanho);
-
+//void embaralhar(Registro* v, int tamanho);
+void trocarNoArquivo(FILE* arquivo, long i, long j);
 
 bool BuscaSequencialIndexada(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados){
 
@@ -221,7 +221,7 @@ void criaDecrescente(int quantidade){
     }
     fclose(arquivo);
 }
-
+/*
 void criaAleatorio(int quantidade){
     FILE* arquivo;
     if((arquivo = fopen("registros.bin", "wb")) == NULL){
@@ -253,7 +253,52 @@ void criaAleatorio(int quantidade){
         fwrite(&pag, sizeof(Registro), tam, arquivo);
     }
     fclose(arquivo);
-}   
+}   */
+
+void trocarNoArquivo(FILE* arquivo, long i, long j) {
+    Registro a, b;
+
+    fseek(arquivo, i * sizeof(Registro), SEEK_SET);
+    fread(&a, sizeof(Registro), 1, arquivo);
+
+    fseek(arquivo, j * sizeof(Registro), SEEK_SET);
+    fread(&b, sizeof(Registro), 1, arquivo);
+
+    // Troca
+    fseek(arquivo, i * sizeof(Registro), SEEK_SET);
+    fwrite(&b, sizeof(Registro), 1, arquivo);
+
+    fseek(arquivo, j * sizeof(Registro), SEEK_SET);
+    fwrite(&a, sizeof(Registro), 1, arquivo);
+}
+
+void criaAleatorio(int quantidade) {
+    FILE* arquivo;
+    if ((arquivo = fopen("registros.bin", "w+b")) == NULL) {  // "w+b": leitura e escrita
+        printf("Erro ao abrir o arquivo\n");
+        return;
+    }
+
+    // 1. Escreve sequencialmente (rápido, sem alocação)
+    Registro r;
+    for (int i = 0; i < quantidade; i++) {
+        r.chave = i;
+        r.dado1 = i * 10;
+        sprintf(r.dado2, "%d", i);
+        sprintf(r.dado3, "%d", i);
+        fwrite(&r, sizeof(Registro), 1, arquivo);
+    }
+
+    // 2. Fisher-Yates sobre o arquivo
+    srand(time(NULL));
+    for (long i = quantidade - 1; i > 0; i--) {
+        long j = rand() % (i + 1);  // j in [0, i]
+        if (i != j)
+            trocarNoArquivo(arquivo, i, j);
+    }
+
+    fclose(arquivo);
+}
 
 void CriaArquivo(int quantidade, char* situacao){
     if(strcmp(situacao, "crescente") == 0){
