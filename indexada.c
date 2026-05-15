@@ -283,3 +283,5 @@ void embaralhar(Registro* v, int tamanho) {
     }
 }
 
+
+

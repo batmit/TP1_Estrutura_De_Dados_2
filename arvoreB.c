@@ -4,6 +4,19 @@ void Inicializa(TipoPagina** raiz) {
     *raiz = NULL;
 }
 
+void ArvoreB(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados) {
+    TipoPagina *arvoreB;
+    Inicializa(&arvoreB);
+
+    Registro reg;
+    
+    for(int i = 0; i < quantidade; i++){
+        fread(&reg, sizeof(Registro), 1, arquivo);
+        Insere(reg, &arvoreB, situacao, dados);
+    }
+}
+
+
 void Pesquisa(Registro *x, TipoPagina* Ap, char* situacao, Dados* dados) {
     long i = 1;
     if(Ap == NULL){

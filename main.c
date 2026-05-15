@@ -7,8 +7,9 @@
 #include "arvore.h"
 
 void CalculaMedia(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados, int metodo);
-void imprimirNoArvore(FILE *arquivo, int indice);
-void imprimirArvore(const char *nomeArquivo);
+void imprimirRegistros();
+//void imprimirNoArvore(FILE *arquivo, int indice);
+//void imprimirArvore(const char *nomeArquivo);
 
 
 int main(int argc, char *argv[]){//pesquisa <método> <quantidade> <situação> <chave> [-P] 
@@ -60,7 +61,7 @@ int main(int argc, char *argv[]){//pesquisa <método> <quantidade> <situação> 
     }
 
     if(argc == 6 && strcmp(argv[5], "-P") == 0) {//
-        printf("a");
+        imprimirRegistros();
     }
 
     double tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
@@ -128,3 +129,21 @@ void CalculaMedia(FILE* arquivo, int quantidade, char* situacao, Registro* resul
     printf("Media de Transferencias na Pesquisa: %d\n", totalTransferenciasPesquisa / 10);
     printf("Media de Tempo: %lf s\n", totalTempo / 10);
 }
+
+
+void imprimirRegistros(){
+
+    FILE *registros = fopen("registros.bin", "rb");
+    Registro reg;
+    while(fread(&reg, sizeof(Registro), 1, registros) > 0){
+
+        printf("Chave: %d\n", reg.chave);
+
+
+    }
+
+    fclose(registros);
+
+
+}
+

@@ -11,9 +11,9 @@ typedef struct No {
 
 void ArvoreBinariaDePesquisa(FILE* arquivo, int quantidade, char* situacao, Registro* resultado, Dados* dados);
 
-bool ArvoreBuscaBinaria(FILE* arquivo, char* situacao, int* paginas, Registro* resultado, Dados* dados);
+bool ArvoreBuscaBinaria(FILE* arquivo, char* situacao, Registro* resultado, Dados* dados);
 
-bool Busca(FILE* arquivo, No* no, int indice, int* paginas, No* pagina, Registro* resultado, Dados* dados, int *paginaCarregada);
+bool Busca(FILE* arquivo, No* no, int indice, No* pagina, Registro* resultado, Dados* dados, int *paginaCarregada);
 void criarArvore(char *situacao, int quantidade);
 
 void inserirArvore(FILE *arquivoArvore, No *noCopia);

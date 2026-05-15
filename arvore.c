@@ -10,23 +10,12 @@ void ArvoreBinariaDePesquisa(FILE* arquivo, int quantidade, char* situacao, Regi
         printf("Erro ao abrir o arquivo\n");
         return;
     }
-    //Guarda as chaves do índice
-    printf("Criando indice...\n");
-    int *paginas = (int*) malloc(sizeof(int) * (quantidade / TAM_PAGINA + 1));//+1 caso quantidade % TAM_PAGINA != 0
-
-    //
-    for(int i = 0; i < quantidade / TAM_PAGINA + 1; i++){
-        paginas[i] = i * TAM_PAGINA;//paginas[i] guarda o indice do primeiro item da página i no arquivo. ex: paginas[0] = 0, paginas[1] = 30, paginas[2] = 60, e assim por diante.
-    }
-    //paginas[i] guarda o indice do primeiro item da página i no arquivo. ex: paginas[0] = 0, paginas[1] = 30, paginas[2] = 60, e assim por diante.
-    //Guarda uma pagina de registros
-
-    ArvoreBuscaBinaria(arquivo, situacao, paginas, resultado, dados);
-
-    free(paginas);
+    
+    ArvoreBuscaBinaria(arquivo, situacao, resultado, dados);
+    fclose(arquivo);
 }
 
-bool ArvoreBuscaBinaria(FILE* arquivo, char* situacao, int* paginas, Registro* resultado, Dados* dados){
+bool ArvoreBuscaBinaria(FILE* arquivo, char* situacao, Registro* resultado, Dados* dados){
     //O arquivo contem uma arvore, em que cada item do arquivo é um nó da árvore, 
     //e cada nó tem um registro e dois endereços, neste caso, indices, para os filhos esquerdo e direito, 
     //ex: o item 10 é o primeiro item do arquivo e possui dois filhos, os itens 5 e 15, filho esq e dir, respectivamente. 
@@ -38,17 +27,19 @@ bool ArvoreBuscaBinaria(FILE* arquivo, char* situacao, int* paginas, Registro* r
     No raiz;
 
     printf("Lendo a raiz da arvore...\n");
+
+    dados->transferencias.indexacao++;//contabiliza a transferência da raiz da árvore, que é o primeiro item do arquivo, ou seja, o item 0
     fread(pagina, sizeof(No), TAM_PAGINA, arquivo);//lê a primeira página do arquivo para o vetor, onde pagina[0] é o primeiro item do arquivo, pagina[1] é o segundo, e assim por diante. 
+    
     raiz = pagina[0];
-    dados->transferencias.indexacao++;//contabiliza a
     
     int paginaCarregada = 0; // página 0 já foi lida no fread inicial
-    return Busca(arquivo, &raiz, 0, paginas, pagina, resultado, dados, &paginaCarregada);//começa a busca na raiz da árvore, que é o primeiro item do arquivo, ou seja, o item 0
+    return Busca(arquivo, &raiz, 0, pagina, resultado, dados, &paginaCarregada);//começa a busca na raiz da árvore, que é o primeiro item do arquivo, ou seja, o item 0
 
     //
 }
 
-bool Busca(FILE* arquivo, No* no, int indice, int* paginas, No* pagina, Registro* resultado, Dados* dados, int *paginaCarregada){
+bool Busca(FILE* arquivo, No* no, int indice, No* pagina, Registro* resultado, Dados* dados, int *paginaCarregada){
     //Busca a chave do resultado no nó do arquivo indicado pelo indice, e retorna o registro encontrado ou NULL se não encontrar
     //A função é chamada recursivamente para percorrer a árvore, comparando a chave do resultado com a chave do nó atual, 
     //e decidindo se deve ir para o filho esquerdo ou direito, até encontrar a chave ou chegar em um nó folha.
@@ -64,15 +55,16 @@ bool Busca(FILE* arquivo, No* no, int indice, int* paginas, No* pagina, Registro
 
     if(paginaNecessaria != *paginaCarregada){
         fseek(arquivo, paginaNecessaria * TAM_PAGINA * sizeof(No), SEEK_SET);
+        dados->transferencias.pesquisa++;//contabiliza a transferência da página necessária para acessar o nó desejado 
         fread(pagina, sizeof(No), TAM_PAGINA, arquivo);
         *paginaCarregada = paginaNecessaria;
-        dados->transferencias.pesquisa++;
     }
 
     *no = pagina[indice % TAM_PAGINA];
 
 
     printf("Comparando a chave %d com a chave do nó atual %d...\n", resultado->chave, no->reg.chave);
+
     dados->comparacoes.pesquisa++;//contabiliza a comparação da chave do resultado com a chave do nó atual
     if(no->reg.chave == resultado->chave){
         *resultado = no->reg;
@@ -80,9 +72,9 @@ bool Busca(FILE* arquivo, No* no, int indice, int* paginas, No* pagina, Registro
         return true;
     }
     else if(no->reg.chave > resultado->chave)
-        return Busca(arquivo, no, no->indiceEsq, paginas, pagina, resultado, dados, paginaCarregada);
+        return Busca(arquivo, no, no->indiceEsq, pagina, resultado, dados, paginaCarregada);
     else
-        return Busca(arquivo, no, no->indiceDir, paginas, pagina, resultado, dados, paginaCarregada);
+        return Busca(arquivo, no, no->indiceDir, pagina, resultado, dados, paginaCarregada);
 }
 
 void criarArvore(char *situacao, int quantidade){
