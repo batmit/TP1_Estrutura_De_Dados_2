@@ -42,7 +42,7 @@ int main(int argc, char *argv[]){//pesquisa <método> <quantidade> <situação> 
         inicio = clock();
         ArvoreBinariaDePesquisa(arquivo, atoi(argv[2]), argv[3], &resultado, &dados);
         fim = clock();
-        imprimirArvore("arvore.bin");
+        //imprimirArvore("arvore.bin");
     }
     else if(atoi(argv[1]) == 3){//Árvore B
         inicio = clock();

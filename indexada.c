@@ -235,7 +235,7 @@ void criaAleatorio(int quantidade){
     int cont = 0;
     for(int i = 0; i < quantidade / TAM_PAGINA + 1; i++){
 
-        if(i == quantidade / TAM_PAGINA)
+        if(i == quantidade / TAM_PAGINA && quantidade % TAM_PAGINA != 0)//se for a última página e a quantidade de registros não for múltipla de TAM_PAGINA, tam é igual ao resto da divisão
             tam = quantidade % TAM_PAGINA;
     
         for(int j = 0; j < tam; j++){
@@ -250,7 +250,7 @@ void criaAleatorio(int quantidade){
 
         embaralhar(pag, tam);
 
-        fwrite(&pag, sizeof(Registro), 1, arquivo);
+        fwrite(&pag, sizeof(Registro), tam, arquivo);
     }
     fclose(arquivo);
 }   

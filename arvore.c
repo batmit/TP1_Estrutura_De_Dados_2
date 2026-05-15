@@ -42,13 +42,13 @@ bool ArvoreBuscaBinaria(FILE* arquivo, char* situacao, int* paginas, Registro* r
     raiz = pagina[0];
     dados->transferencias.indexacao++;//contabiliza a
     
-
-    return Busca(arquivo, &raiz, 0, paginas, pagina, resultado, dados);//começa a busca na raiz da árvore, que é o primeiro item do arquivo, ou seja, o item 0
+    int paginaCarregada = 0; // página 0 já foi lida no fread inicial
+    return Busca(arquivo, &raiz, 0, paginas, pagina, resultado, dados, &paginaCarregada);//começa a busca na raiz da árvore, que é o primeiro item do arquivo, ou seja, o item 0
 
     //
 }
 
-bool Busca(FILE* arquivo, No* no, int indice, int* paginas, No* pagina, Registro* resultado, Dados* dados){
+bool Busca(FILE* arquivo, No* no, int indice, int* paginas, No* pagina, Registro* resultado, Dados* dados, int *paginaCarregada){
     //Busca a chave do resultado no nó do arquivo indicado pelo indice, e retorna o registro encontrado ou NULL se não encontrar
     //A função é chamada recursivamente para percorrer a árvore, comparando a chave do resultado com a chave do nó atual, 
     //e decidindo se deve ir para o filho esquerdo ou direito, até encontrar a chave ou chegar em um nó folha.
@@ -59,14 +59,18 @@ bool Busca(FILE* arquivo, No* no, int indice, int* paginas, No* pagina, Registro
     }
     //int paginaAtual = indice / TAM_PAGINA;
     //if(indice < paginas[paginaAtual] || indice >= paginas[paginaAtual + 1]){
-    if(indice < paginas[indice] || indice >= paginas[indice + 1]){//Se o indice do nó atual nao estiver na pagina atual, realiza a leitura da nova pagina
-        int paginaAtual = indice / TAM_PAGINA;//paginaAtual é o indice da página onde esta o nó indicado pelo indice
-        fseek(arquivo, paginaAtual * TAM_PAGINA * sizeof(No), SEEK_SET);//posiciona o ponteiro do arquivo no início da página onde esta o nó indicado pelo indice
-        fread(pagina, sizeof(No), TAM_PAGINA, arquivo);//lê o nó indicado pelo indice para a memória
-        dados->transferencias.pesquisa++;//contabiliza a transferência de registros do arquivo para a memória
+
+    int paginaNecessaria = indice / TAM_PAGINA;
+
+    if(paginaNecessaria != *paginaCarregada){
+        fseek(arquivo, paginaNecessaria * TAM_PAGINA * sizeof(No), SEEK_SET);
+        fread(pagina, sizeof(No), TAM_PAGINA, arquivo);
+        *paginaCarregada = paginaNecessaria;
+        dados->transferencias.pesquisa++;
     }
 
-    *no = pagina[indice % TAM_PAGINA];//indice % TAM_PAGINA é o indice do nó na página lida para a memória, ou seja, o indice do nó na página atual
+    *no = pagina[indice % TAM_PAGINA];
+
 
     printf("Comparando a chave %d com a chave do nó atual %d...\n", resultado->chave, no->reg.chave);
     dados->comparacoes.pesquisa++;//contabiliza a comparação da chave do resultado com a chave do nó atual
@@ -76,9 +80,9 @@ bool Busca(FILE* arquivo, No* no, int indice, int* paginas, No* pagina, Registro
         return true;
     }
     else if(no->reg.chave > resultado->chave)
-        return Busca(arquivo, no, no->indiceEsq, paginas, pagina, resultado, dados);
+        return Busca(arquivo, no, no->indiceEsq, paginas, pagina, resultado, dados, paginaCarregada);
     else
-        return Busca(arquivo, no, no->indiceDir, paginas, pagina, resultado, dados);
+        return Busca(arquivo, no, no->indiceDir, paginas, pagina, resultado, dados, paginaCarregada);
 }
 
 void criarArvore(char *situacao, int quantidade){
