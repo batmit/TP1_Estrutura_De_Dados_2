@@ -100,7 +100,7 @@ void CalculaMedia(FILE* arquivo, int quantidade, char* situacao, Registro* resul
         else if(metodo == 2)
             ArvoreBinariaDePesquisa(arquivo, quantidade, situacao, resultado, dados, TAM_PAG);
         else if (metodo == 3){
-            //ArvoreB(arquivo, quantidade, resultado, dados);
+            ArvoreB(arquivo, quantidade, situacao, resultado, dados, TAM_PAG);
             printf("Arvore b\n");
         }
         else if (metodo == 4){
